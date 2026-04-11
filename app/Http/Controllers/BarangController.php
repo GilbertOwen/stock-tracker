@@ -36,7 +36,7 @@ class BarangController extends Controller
         $validated = $request->validate([
             'nama'      => 'required|string|max:255',
             'id_satuan' => 'required|exists:satuans,id_satuan',
-            'Harga'     => 'nullable|integer|min:0',
+            'harga'     => 'nullable|integer|min:0',
         ]);
 
         Barang::create($validated);
@@ -72,7 +72,7 @@ class BarangController extends Controller
         $validated = $request->validate([
             'nama'      => 'required|string|max:255',
             'id_satuan' => 'required|exists:satuans,id_satuan',
-            'Harga'     => 'nullable|integer|min:0',
+            'harga'     => 'nullable|integer|min:0',
         ]);
 
         $barang->update($validated);

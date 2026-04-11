@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_barang');
             $table->string('nama');
             $table->integer('harga');
-            $table->foreignId('satuan_id')->constrained('satuans', 'id_satuan')->cascadeOnDelete();
+            $table->foreignId('id_satuan')->constrained('satuans', 'id_satuan')->cascadeOnDelete();
             $table->timestamps();
         });
     }

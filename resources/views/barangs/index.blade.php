@@ -99,6 +99,7 @@
                 <tr class="bg-ink-100 text-xs font-semibold text-ink-500 uppercase tracking-wider">
                     <th class="text-left px-6 py-3 w-10">#</th>
                     <th class="text-left px-4 py-3">Nama Barang</th>
+                    <th class="text-left px-4 py-3">Stok</th>
                     <th class="text-left px-4 py-3">Satuan</th>
                     <th class="text-right px-4 py-3">Harga</th>
                     <th class="text-center px-4 py-3 w-36">Aksi</th>
@@ -120,10 +121,19 @@
                                 <span class="text-ink-400 text-xs">—</span>
                             @endif
                         </td>
+                        <td class="px-4 py-3.5">
+                            @if ($barang->satuan)
+                                <span class="inline-flex items-center bg-sky-50 text-sky-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-200">
+                                    {{ $barang->stok->jumlah ?? 'Belum diisi' }}
+                                </span>
+                            @else
+                                <span class="text-ink-400 text-xs">—</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3.5 text-right">
-                            @if ($barang->Harga !== null)
+                            @if ($barang->harga !== null)
                                 <span class="font-semibold text-ink-900">
-                                    Rp {{ number_format($barang->Harga, 0, ',', '.') }}
+                                    Rp {{ number_format($barang->harga, 0, ',', '.') }}
                                 </span>
                             @else
                                 <span class="text-ink-400 text-xs">—</span>
