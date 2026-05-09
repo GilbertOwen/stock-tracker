@@ -56,9 +56,9 @@
         </div>
         <div>
             <p class="text-2xl font-bold text-ink-900">
-                Rp {{ number_format($barangs->avg('Harga') ?? 0, 0, ',', '.') }}
+                Rp {{ number_format($barangs->avg('harga_jual') ?? 0, 0, ',', '.') }}
             </p>
-            <p class="text-xs text-ink-500 font-medium">Rata-rata Harga</p>
+            <p class="text-xs text-ink-500 font-medium">Rata-rata Harga Jual</p>
         </div>
     </div>
 
@@ -101,7 +101,8 @@
                     <th class="text-left px-4 py-3">Nama Barang</th>
                     <th class="text-left px-4 py-3">Stok</th>
                     <th class="text-left px-4 py-3">Satuan</th>
-                    <th class="text-right px-4 py-3">Harga</th>
+                    <th class="text-right px-4 py-3">Harga Beli</th>
+                    <th class="text-right px-4 py-3">Harga Jual</th>
                     <th class="text-center px-4 py-3 w-36">Aksi</th>
                 </tr>
             </thead>
@@ -131,9 +132,18 @@
                             @endif
                         </td>
                         <td class="px-4 py-3.5 text-right">
-                            @if ($barang->harga !== null)
+                            @if ($barang->harga_beli !== null)
+                                <span class="font-semibold text-ink-700">
+                                    Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}
+                                </span>
+                            @else
+                                <span class="text-ink-400 text-xs">—</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3.5 text-right">
+                            @if ($barang->harga_jual !== null)
                                 <span class="font-semibold text-ink-900">
-                                    Rp {{ number_format($barang->harga, 0, ',', '.') }}
+                                    Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}
                                 </span>
                             @else
                                 <span class="text-ink-400 text-xs">—</span>

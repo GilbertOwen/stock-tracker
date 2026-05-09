@@ -8,8 +8,8 @@ class Barang extends Model
 {
     protected $table = 'barangs';
     protected $primaryKey = 'id_barang';
-    protected $fillable = ['nama', 'harga', 'id_satuan'];
-    
+    protected $fillable = ['nama', 'harga_beli', 'harga_jual', 'id_satuan'];
+
     public function satuan()
     {
         return $this->belongsTo(Satuan::class, 'id_satuan', 'id_satuan');
@@ -20,6 +20,13 @@ class Barang extends Model
     }
     public function transaksiStok()
     {
-        return $this->hasMany(TransaksiStok::class, 'id_barang', 'id_barang');
+        return $this->hasManyThrough(
+            TransaksiStok::class,
+            Stok::class,
+            'id_barang',  // FK di stoks
+            'stok_id',    // FK di transaksi_stoks
+            'id_barang',  // PK di barangs
+            'id_stok'     // PK di stoks
+        );
     }
 }
