@@ -75,28 +75,28 @@
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-ink-500 uppercase tracking-widest">Transaksi</p>
 
-            <a href="#" class="nav-link text-slate-600 flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium cursor-not-allowed">
+            <a href="{{ route('stok-masuk.index') }}"
+               class="nav-link {{ request()->routeIs('stok-masuk.*') ? 'active' : 'text-slate-400' }} flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Stok Masuk
-                <span class="ml-auto text-[10px] bg-white/10 text-slate-500 px-1.5 py-0.5 rounded font-medium">Soon</span>
             </a>
 
-            <a href="#" class="nav-link text-slate-600 flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium cursor-not-allowed">
+            <a href="{{ route('stok-keluar.index') }}"
+               class="nav-link {{ request()->routeIs('stok-keluar.*') ? 'active' : 'text-slate-400' }} flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Stok Keluar
-                <span class="ml-auto text-[10px] bg-white/10 text-slate-500 px-1.5 py-0.5 rounded font-medium">Soon</span>
             </a>
 
-            <a href="#" class="nav-link text-slate-600 flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium cursor-not-allowed">
+            <a href="{{ route('histori-stok.index') }}"
+               class="nav-link {{ request()->routeIs('histori-stok.*') ? 'active' : 'text-slate-400' }} flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Histori Stok
-                <span class="ml-auto text-[10px] bg-white/10 text-slate-500 px-1.5 py-0.5 rounded font-medium">Soon</span>
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-ink-500 uppercase tracking-widest">Tools</p>

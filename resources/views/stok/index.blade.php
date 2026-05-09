@@ -2,9 +2,35 @@
 
 @section('title', 'Stok Barang')
 @section('page-title', 'Stok Barang')
-@section('page-subtitle', 'Pantau dan atur jumlah stok setiap barang')
+@section('page-subtitle', 'Pantau jumlah stok setiap barang')
+
+@section('header-action')
+    <div class="flex items-center gap-2">
+        <a href="{{ route('stok-masuk.create') }}"
+           class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
+            Catat Masuk
+        </a>
+        <a href="{{ route('stok-keluar.create') }}"
+           class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15"/>
+            </svg>
+            Catat Keluar
+        </a>
+    </div>
+@endsection
 
 @section('content')
+
+<div class="mb-4 flex items-start gap-3 px-4 py-3 bg-sky-50 border border-sky-200 text-sky-800 text-xs font-medium rounded-lg">
+    <svg class="w-4 h-4 text-sky-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+    </svg>
+    <span>Halaman ini bersifat <strong>read-only</strong>. Untuk mengubah stok, gunakan menu <strong>Stok Masuk</strong> atau <strong>Stok Keluar</strong>.</span>
+</div>
 
 {{-- Summary cards --}}
 <div class="grid grid-cols-3 gap-4 mb-6">
@@ -76,7 +102,6 @@
                     <th class="text-left px-4 py-3">Satuan</th>
                     <th class="text-center px-4 py-3">Jumlah Stok</th>
                     <th class="text-center px-4 py-3">Status</th>
-                    <th class="text-center px-4 py-3 w-28">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink-300">
@@ -134,15 +159,6 @@
                                     Aman
                                 </span>
                             @endif
-                        </td>
-                        <td class="px-4 py-3.5 text-center">
-                            <a href="{{ route('stok.edit', $barang->id_barang) }}"
-                               class="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-700 hover:text-brand-600 border border-ink-300 hover:border-brand-400 px-3 py-1.5 rounded-lg transition-colors">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
-                                </svg>
-                                Set Stok
-                            </a>
                         </td>
                     </tr>
                 @endforeach

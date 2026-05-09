@@ -27,26 +27,26 @@ class ImportController extends Controller
 
         $spreadsheet = IOFactory::load($fullPath);
         try {
-
             // Cari sheet yang punya header kolom yang dikenali
             $worksheet = null;
+            $headerRow = null;
             foreach ($spreadsheet->getAllSheets() as $sheet) {
                 foreach ($sheet->getRowIterator(1, 10) as $row) {
                     $cells = [];
                     foreach ($row->getCellIterator() as $cell) {
                         $cells[] = strtolower(trim((string) $cell->getValue()));
                     }
-                    // Deteksi baris header: ada "nama barang" atau "satuan"
                     if (in_array('nama barang', $cells) || in_array('satuan', $cells)) {
-                        $worksheet   = $sheet;
-                        $headerRow   = $row->getRowIndex();
+                        $worksheet = $sheet;
+                        $headerRow = $row->getRowIndex();
                         break 2;
                     }
                 }
             }
 
             if (!$worksheet) {
-                return back()->with('error', 'Format Excel tidak dikenali. Pastikan ada kolom: Nama Barang, Satuan, Stok, Harga.');
+                Storage::delete($path);
+                return back()->with('error', 'Format Excel tidak dikenali. Pastikan ada kolom: Nama Barang, Satuan, Stok, Harga Beli, Harga Jual.');
             }
 
             // Baca header untuk mapping kolom
@@ -57,38 +57,44 @@ class ImportController extends Controller
                 }
             }
 
-            // Balik mapping: nama_kolom => huruf_kolom
-            $colMap = array_flip($headers); // ['nama barang' => 'B', 'satuan' => 'C', ...]
+            $colMap = array_flip($headers);
 
             $colNama   = $colMap['nama barang'] ?? null;
-            $colSatuan = $colMap['satuan']       ?? null;
-            $colStok   = $colMap['stok']         ?? null;
-            $colHarga  = $colMap['harga']         ?? null;
+            $colSatuan = $colMap['satuan']      ?? null;
+            $colStok   = $colMap['stok']        ?? null;
+
+            // Mapping harga beli & harga jual (multiple alias)
+            $colHargaBeli = $colMap['harga beli']
+                ?? $colMap['harga pokok']
+                ?? null;
+
+            $colHargaJual = $colMap['harga jual']
+                ?? $colMap['harga']
+                ?? null;
 
             if (!$colNama || !$colSatuan) {
+                Storage::delete($path);
                 return back()->with('error', 'Kolom "Nama Barang" atau "Satuan" tidak ditemukan di Excel.');
             }
 
-            // Proses data mulai baris setelah header
             $dataStartRow = $headerRow + 1;
             $highestRow   = $worksheet->getHighestDataRow();
 
             $stats = ['satuan' => 0, 'barang' => 0, 'stok' => 0, 'skip' => 0];
 
             for ($rowIdx = $dataStartRow; $rowIdx <= $highestRow; $rowIdx++) {
-
-                $nama   = trim((string) ($worksheet->getCell($colNama . $rowIdx)->getValue() ?? ''));
+                $nama       = trim((string) ($worksheet->getCell($colNama . $rowIdx)->getValue() ?? ''));
                 $satuanNama = trim((string) ($colSatuan ? $worksheet->getCell($colSatuan . $rowIdx)->getValue() : ''));
-                $jumlah = $colStok  ? $worksheet->getCell($colStok  . $rowIdx)->getValue() : null;
-                $harga  = $colHarga ? $worksheet->getCell($colHarga  . $rowIdx)->getValue() : null;
+                $jumlah     = $colStok      ? $worksheet->getCell($colStok      . $rowIdx)->getValue() : null;
+                $hargaBeli  = $colHargaBeli ? $worksheet->getCell($colHargaBeli . $rowIdx)->getValue() : null;
+                $hargaJual  = $colHargaJual ? $worksheet->getCell($colHargaJual . $rowIdx)->getValue() : null;
 
-                // Skip baris kosong
                 if ($nama === '' || $nama === null) {
                     $stats['skip']++;
                     continue;
                 }
 
-                // 1. Cari atau buat Satuan
+                // 1. Satuan
                 $satuan = null;
                 if ($satuanNama !== '') {
                     $satuan = Satuan::firstOrCreate(['nama' => $satuanNama]);
@@ -97,15 +103,18 @@ class ImportController extends Controller
                     }
                 }
 
-                // 2. Cari atau buat Barang
-                // Gunakan updateOrCreate agar import bisa dijalankan ulang tanpa duplikat
+                // Harga Excel dalam ribuan → DB dalam rupiah penuh.
+                // Jika nilai bukan angka (misal teks "untuk bonus") → 0
+                $hargaBeliFinal = is_numeric($hargaBeli) ? (int) ($hargaBeli * 1000) : 0;
+                $hargaJualFinal = is_numeric($hargaJual) ? (int) ($hargaJual * 1000) : null;
+
+                // 2. Barang
                 $barang = Barang::updateOrCreate(
                     ['nama' => $nama],
                     [
-                        'id_satuan' => $satuan?->id_satuan,
-                        'harga'     => is_numeric($harga) ? (int) ($harga * 1000) : null,
-                        // Harga di Excel tampaknya dalam ribuan (contoh: 80 = Rp 80.000)
-                        // Hapus * 1000 jika harga di Excel sudah dalam rupiah penuh
+                        'id_satuan'  => $satuan?->id_satuan,
+                        'harga_beli' => $hargaBeliFinal,
+                        'harga_jual' => $hargaJualFinal,
                     ]
                 );
 
@@ -113,7 +122,7 @@ class ImportController extends Controller
                     $stats['barang']++;
                 }
 
-                // 3. Cari atau update Stok
+                // 3. Stok
                 if (is_numeric($jumlah)) {
                     Stok::updateOrCreate(
                         ['id_barang' => $barang->id_barang],
@@ -123,7 +132,6 @@ class ImportController extends Controller
                 }
             }
 
-            // Hapus file temp
             Storage::delete($path);
 
             $msg = "Import selesai: {$stats['barang']} barang baru, {$stats['satuan']} satuan baru, {$stats['stok']} stok diperbarui.";
