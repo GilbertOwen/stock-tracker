@@ -116,7 +116,7 @@
                         <td class="px-4 py-3.5">
                             @if ($barang->satuan)
                                 <span class="inline-flex items-center bg-sky-50 text-sky-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-200">
-                                    {{ $barang->satuan->nama }}
+                                    {{ $barang->stok->jumlah ?? 'Belum diisi' }}
                                 </span>
                             @else
                                 <span class="text-ink-400 text-xs">—</span>
@@ -125,7 +125,7 @@
                         <td class="px-4 py-3.5">
                             @if ($barang->satuan)
                                 <span class="inline-flex items-center bg-sky-50 text-sky-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-200">
-                                    {{ $barang->stok->jumlah ?? 'Belum diisi' }}
+                                    {{ $barang->satuan->nama ?? 'Belum diisi' }}
                                 </span>
                             @else
                                 <span class="text-ink-400 text-xs">—</span>
