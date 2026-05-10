@@ -16,11 +16,14 @@
         <div class="text-sm text-sky-800">
             <p class="font-semibold mb-1">Format Excel yang didukung</p>
             <ul class="space-y-0.5 text-sky-700 text-xs">
-                <li>✓ File <span class="font-mono bg-sky-100 px-1 rounded">.xlsx</span> atau <span class="font-mono bg-sky-100 px-1 rounded">.xls</span></li>
-                <li>✓ Header kolom harus ada: <span class="font-semibold">Nama Barang, Satuan, Stok, Harga</span></li>
-                <li>✓ Data boleh ada di sheet mana saja — sistem akan mendeteksi otomatis</li>
-                <li>✓ Jika barang sudah ada, data akan diperbarui (tidak duplikat)</li>
-                <li>✓ Harga di Excel dianggap dalam ribuan rupiah (80 = Rp 80.000)</li>
+                <li>✓ File <span class="font-mono bg-sky-100 px-1 rounded">.xlsx</span> atau <span class="font-mono bg-sky-100 px-1 rounded">.xls</span> (maks 5MB)</li>
+                <li>✓ Wajib ada kolom: <span class="font-semibold">Jenis Barang</span> (atau "Nama Barang") &amp; <span class="font-semibold">Stok Akhir</span> (atau "Stok")</li>
+                <li>✓ Kolom opsional: <span class="font-mono">Bulan</span>, <span class="font-mono">Tanggal</span>, <span class="font-mono">Satuan</span>, <span class="font-mono">Stok Awal</span>, <span class="font-mono">Stok Masuk</span>, <span class="font-mono">Stok Keluar</span>, <span class="font-mono">Harga Beli</span>, <span class="font-mono">Harga Jual</span></li>
+                <li>✓ Harga sudah dalam rupiah penuh (mis. 57000 = Rp 57.000) — TIDAK dikali 1.000</li>
+                <li>✓ Jika ada <span class="font-mono">Stok Masuk</span> / <span class="font-mono">Stok Keluar</span> &gt; 0, otomatis dicatat ke histori transaksi</li>
+                <li>✓ Harga Beli berupa teks (mis. "untuk bonus") → otomatis 0 dan ditandai bonus</li>
+                <li>✓ Barang tanpa kolom Satuan akan diberi satuan default <span class="font-mono">pcs</span></li>
+                <li>✓ Baris "Total" / kosong otomatis dilewati</li>
             </ul>
         </div>
     </div>
@@ -82,16 +85,14 @@
                 <span id="file-size" class="text-xs text-emerald-600 flex-shrink-0">—</span>
             </div>
 
-            {{-- Warning konversi harga --}}
+            {{-- Info: yang akan terjadi saat import --}}
             <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex gap-2.5 items-start">
                 <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
                 </svg>
                 <p class="text-xs text-amber-800">
-                    <span class="font-semibold">Perhatian konversi harga:</span>
-                    Nilai harga di Excel (contoh: <span class="font-mono">80</span>) akan disimpan sebagai
-                    <span class="font-mono">Rp 80.000</span> (dikali 1.000).
-                    Jika harga di Excel sudah dalam rupiah penuh, beri tahu saya agar saya sesuaikan kodenya.
+                    <span class="font-semibold">Yang akan dilakukan:</span>
+                    Untuk setiap barang, sistem akan ambil snapshot <strong>terakhir</strong> (baris paling bawah) dari <span class="font-mono">Stok Akhir</span>, <span class="font-mono">Harga Beli</span> &amp; <span class="font-mono">Harga Jual</span> sebagai data master. Jika ada gerakan stok per tanggal, juga dicatat ke histori transaksi.
                 </p>
             </div>
 
@@ -120,20 +121,27 @@
             <table class="w-full text-xs">
                 <thead>
                     <tr class="bg-ink-100 text-ink-500 font-semibold uppercase tracking-wider">
-                        <th class="px-4 py-2 text-left">No</th>
-                        <th class="px-4 py-2 text-left">Nama Barang</th>
-                        <th class="px-4 py-2 text-left">Satuan</th>
-                        <th class="px-4 py-2 text-left">Stok</th>
-                        <th class="px-4 py-2 text-left">Harga</th>
+                        <th class="px-3 py-2 text-left">Bulan</th>
+                        <th class="px-3 py-2 text-left">Tanggal</th>
+                        <th class="px-3 py-2 text-left">Jenis Barang</th>
+                        <th class="px-3 py-2 text-right">Stok Awal</th>
+                        <th class="px-3 py-2 text-right">Stok Masuk</th>
+                        <th class="px-3 py-2 text-right">Stok Keluar</th>
+                        <th class="px-3 py-2 text-right">Stok Akhir</th>
+                        <th class="px-3 py-2 text-right">Harga Beli</th>
+                        <th class="px-3 py-2 text-right">Harga Jual</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-ink-200 text-ink-700">
-                    <tr><td class="px-4 py-2">1</td><td class="px-4 py-2">Beras 5 kg merk Sawah</td><td class="px-4 py-2">sak</td><td class="px-4 py-2">24</td><td class="px-4 py-2">80</td></tr>
-                    <tr class="bg-ink-50"><td class="px-4 py-2">2</td><td class="px-4 py-2">Gula merk Rosebrand</td><td class="px-4 py-2">kg</td><td class="px-4 py-2">25</td><td class="px-4 py-2">18</td></tr>
-                    <tr><td class="px-4 py-2">3</td><td class="px-4 py-2">Minyak goreng Barco 2 L</td><td class="px-4 py-2">pcs</td><td class="px-4 py-2">4</td><td class="px-4 py-2">115</td></tr>
+                    <tr><td class="px-3 py-2">Januari</td><td class="px-3 py-2">1</td><td class="px-3 py-2">sphp</td><td class="px-3 py-2 text-right">194</td><td class="px-3 py-2 text-right">0</td><td class="px-3 py-2 text-right">2</td><td class="px-3 py-2 text-right">192</td><td class="px-3 py-2 text-right">57.000</td><td class="px-3 py-2 text-right">60.000</td></tr>
+                    <tr class="bg-ink-50"><td class="px-3 py-2"></td><td class="px-3 py-2"></td><td class="px-3 py-2">Gula 1 kg</td><td class="px-3 py-2 text-right">75</td><td class="px-3 py-2 text-right">0</td><td class="px-3 py-2 text-right">11</td><td class="px-3 py-2 text-right">64</td><td class="px-3 py-2 text-right">16.800</td><td class="px-3 py-2 text-right">18.000</td></tr>
+                    <tr><td class="px-3 py-2"></td><td class="px-3 py-2"></td><td class="px-3 py-2">minyak cup rosebrand</td><td class="px-3 py-2 text-right">335</td><td class="px-3 py-2 text-right">0</td><td class="px-3 py-2 text-right">0</td><td class="px-3 py-2 text-right">335</td><td class="px-3 py-2 text-right text-amber-600">untuk bonus</td><td class="px-3 py-2 text-right">0</td></tr>
                 </tbody>
             </table>
         </div>
+        <p class="px-6 py-3 text-[11px] text-ink-500 border-t border-ink-200">
+            Bulan &amp; Tanggal cukup diisi di baris pertama tiap hari (cell merge / blank di baris berikut). Sistem akan auto forward-fill.
+        </p>
     </div>
 
 </div>
